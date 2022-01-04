@@ -4,7 +4,7 @@
 
 ### How to run
 
-- install (foundry)[https://github.com/gakonst/foundry]
+- install [foundry](https://github.com/gakonst/foundry)
 - run `yarn install`
 
 ### How to test
