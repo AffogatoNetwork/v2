@@ -1,0 +1,4 @@
+tasks:
+  - init: sudo apt update && sudo apt install pkg-config libudev-dev && cargo install --git https://github.com/gakonst/foundry --locked --force
+  - init: yarn install
+  - command: forge build
