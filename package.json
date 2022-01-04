@@ -1,0 +1,15 @@
+{
+  "name": "v2",
+  "version": "1.0.0",
+  "description": "affogato v2",
+  "author": "@Crisgarner",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^2.5.1",
+    "prettier-config-solidity": "^1.6.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.19"
+  },
+  "scripts": {
+    "test": "forge test"
+  }
+}
