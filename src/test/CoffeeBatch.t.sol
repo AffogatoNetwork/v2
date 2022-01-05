@@ -36,8 +36,14 @@ interface Hevm {
     // Performs a foreign function call via terminal, (stringInputs) => (result)
     function ffi(string[] calldata) external returns (bytes memory);
 
-    // Calls another contract with a specified `msg.sender`
+    // Performs the next smart contract call with specified `msg.sender`, (newSender)
     function prank(address) external;
+
+    // Performs all the following smart contract calls with specified `msg.sender`, (newSender)
+    function startPrank(address) external;
+
+    // Stop smart contract calls using the specified address with prankStart()
+    function stopPrank() external;
 
     // Sets an address' balance, (who, newBalance)
     function deal(address, uint256) external;
@@ -45,7 +51,7 @@ interface Hevm {
     // Sets an address' code, (who, newCode)
     function etch(address, bytes calldata) external;
 
-    // Expects revert with message
+    // Expects an error on next call
     function expectRevert(bytes calldata) external;
 
     // Expects the next emitted event. Params check topic 1, topic 2, topic 3 and data are the same.
@@ -64,16 +70,36 @@ contract CoffeeBatchTest is DSTest {
     Hevm hevm;
     CoffeeBatch coffeeBatch;
 
-    //Events for testing
+    // @dev Events for testing
     event SetMinter(address indexed owner, address indexed minter, bool status);
+
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed id
+    );
+
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 indexed id
+    );
+
+    event ApprovalForAll(
+        address indexed owner,
+        address indexed operator,
+        bool approved
+    );
 
     function setUp() public {
         hevm = Hevm(HEVM_ADDRESS);
-        coffeeBatch = new CoffeeBatch();
+        coffeeBatch = new CoffeeBatch("Affogato Coffee Batch", "CAFE");
     }
 
     function test_constructor() public {
         assertEq(coffeeBatch.owner(), address(this));
+        assertEq(coffeeBatch.name(), "Affogato Coffee Batch");
+        assertEq(coffeeBatch.symbol(), "CAFE");
     }
 
     function test_addMinter(address _minter) public {
@@ -102,8 +128,30 @@ contract CoffeeBatchTest is DSTest {
         assert(!coffeeBatch.minters(_minter));
     }
 
-    function test_mint() public {
-        assert(false);
+    function test_mint(address _receiver) public {
+        // @dev revert on not owner
+        hevm.prank(user1);
+        hevm.expectRevert("CoffeeBatch: caller is not a minter");
+        coffeeBatch.mint(_receiver);
+
+        coffeeBatch.addMinter(user1);
+        hevm.startPrank(user1);
+        if (_receiver == address(0)) {
+            hevm.expectRevert("INVALID_RECIPIENT");
+            coffeeBatch.mint(_receiver);
+            return;
+        } else {
+            hevm.expectEmit(true, true, true, true);
+            emit Transfer(address(0), _receiver, 1);
+            coffeeBatch.mint(_receiver);
+        }
+        assertEq(coffeeBatch.balanceOf(_receiver), 1);
+        assertEq(coffeeBatch.ownerOf(1), _receiver);
+        coffeeBatch.mint(_receiver);
+        coffeeBatch.mint(_receiver);
+        assertEq(coffeeBatch.balanceOf(_receiver), 3);
+        assertEq(coffeeBatch.ownerOf(2), _receiver);
+        assertEq(coffeeBatch.ownerOf(3), _receiver);
     }
 
     function test_transfer() public {
