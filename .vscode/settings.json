@@ -10,7 +10,8 @@
     },
     "solidity.remappings": [
       "ds-test/=lib/ds-test/src/",
-      "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/"
+      "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/",
+      "solmate/=lib/solmate/src"
     ],
     "[solidity]": { "editor.formatOnSave": true ,
     "editor.defaultFormatter": "esbenp.prettier-vscode"}, 

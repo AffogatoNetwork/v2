@@ -2,6 +2,7 @@
 pragma solidity 0.8.10;
 
 import "openzeppelin-contracts/access/Ownable.sol";
+import "solmate/tokens/ERC721.sol";
 
 // TODO: create interface for CB children
 // TODO: add 721
