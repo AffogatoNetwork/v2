@@ -14,4 +14,4 @@ else
   export PROPTEST_CASES=100 # Only fuzz briefly if DEEP_FUZZ is not set to true.
 fi
 
-forge test --verbosity $DAPP_TEST_VERBOSITY
+forge test -vvv
