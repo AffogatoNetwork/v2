@@ -140,11 +140,12 @@ contract CoffeeBatchTest is DSTest {
             hevm.expectRevert("INVALID_RECIPIENT");
             coffeeBatch.mint(_receiver);
             return;
-        } else {
-            hevm.expectEmit(true, true, true, true);
-            emit Transfer(address(0), _receiver, 1);
-            coffeeBatch.mint(_receiver);
         }
+
+        hevm.expectEmit(true, true, true, true);
+        emit Transfer(address(0), _receiver, 1);
+        coffeeBatch.mint(_receiver);
+
         assertEq(coffeeBatch.balanceOf(_receiver), 1);
         assertEq(coffeeBatch.ownerOf(1), _receiver);
         coffeeBatch.mint(_receiver);
@@ -154,7 +155,31 @@ contract CoffeeBatchTest is DSTest {
         assertEq(coffeeBatch.ownerOf(3), _receiver);
     }
 
+    function test_burn() public {
+        coffeeBatch.addMinter(user1);
+        //        hevm.startPrank(user1);
+        hevm.prank(user1);
+        coffeeBatch.mint(user1);
+
+        hevm.expectRevert("CoffeeBatch: caller is not the owner");
+        hevm.prank(user2);
+        coffeeBatch.burn(1);
+
+        hevm.expectEmit(true, true, true, true);
+        hevm.prank(user1);
+        emit Transfer(user1, address(0), 1);
+        coffeeBatch.burn(1);
+
+        assertEq(coffeeBatch.balanceOf(user1), 0);
+        assertEq(coffeeBatch.ownerOf(1), address(0));
+    }
+
     function test_transfer() public {
+        assert(false);
+    }
+
+    //TODO: test delete approval
+    function test_approval() public {
         assert(false);
     }
 }

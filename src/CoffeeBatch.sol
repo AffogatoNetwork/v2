@@ -37,6 +37,14 @@ contract CoffeeBatch is Ownable, ERC721 {
         _mint(_receiver, currentID);
     }
 
+    function burn(uint256 _id) external {
+        require(
+            ownerOf[_id] == msg.sender,
+            "CoffeeBatch: caller is not the owner"
+        );
+        _burn(_id);
+    }
+
     function tokenURI(uint256 id) public view override returns (string memory) {
         //do something
         return "";
