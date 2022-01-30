@@ -6,7 +6,11 @@ import "solmate/tokens/ERC721.sol";
 
 // TODO: create interface for CB children
 
-contract CoffeeBatch is Ownable, ERC721 {
+// 1. create token
+// 2. transfer to CB
+// 3. update CB state
+
+contract Certificate is Ownable, ERC721 {
     mapping(address => bool) public minters;
     uint256 currentID = 0;
 
@@ -17,7 +21,7 @@ contract CoffeeBatch is Ownable, ERC721 {
     {}
 
     modifier onlyMinter() {
-        require(minters[msg.sender], "CoffeeBatch: caller is not a minter");
+        require(minters[msg.sender], "Certificate: caller is not a minter");
         _;
     }
 
@@ -39,7 +43,7 @@ contract CoffeeBatch is Ownable, ERC721 {
     function burn(uint256 _id) external {
         require(
             ownerOf[_id] == msg.sender,
-            "CoffeeBatch: caller is not the owner"
+            "Certificate: caller is not the owner"
         );
         _burn(_id);
     }
