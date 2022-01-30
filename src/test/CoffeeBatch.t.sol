@@ -157,7 +157,6 @@ contract CoffeeBatchTest is DSTest {
 
     function test_burn() public {
         coffeeBatch.addMinter(user1);
-        //        hevm.startPrank(user1);
         hevm.prank(user1);
         coffeeBatch.mint(user1);
 
@@ -175,11 +174,43 @@ contract CoffeeBatchTest is DSTest {
     }
 
     function test_transfer() public {
-        assert(false);
+        coffeeBatch.addMinter(user1);
+        hevm.prank(user1);
+        coffeeBatch.mint(user1);
+
+        //Wrong owner
+        hevm.expectRevert("NOT_AUTHORIZED");
+        hevm.startPrank(user2);
+        coffeeBatch.transferFrom(user1, user2, 1);
+
+        //Wrong owner
+        hevm.expectRevert("WRONG_FROM");
+        coffeeBatch.transferFrom(user2, user2, 1);
+
+        hevm.expectEmit(true, true, true, true);
+        hevm.prank(user1);
+        emit Transfer(user1, user2, 1);
+        coffeeBatch.transferFrom(user1, user2, 1);
     }
 
-    //TODO: test delete approval
     function test_approval() public {
-        assert(false);
+        coffeeBatch.addMinter(user1);
+        hevm.prank(user1);
+        coffeeBatch.mint(user1);
+
+        //Wrong owner
+        hevm.expectRevert("NOT_AUTHORIZED");
+        hevm.prank(user2);
+        coffeeBatch.approve(user2, 1);
+
+        hevm.expectEmit(true, true, true, true);
+        hevm.prank(user1);
+        emit Approval(user1, user2, 1);
+        coffeeBatch.approve(user2, 1);
+
+        hevm.expectEmit(true, true, true, true);
+        hevm.prank(user2);
+        emit Transfer(user1, user2, 1);
+        coffeeBatch.transferFrom(user1, user2, 1);
     }
 }
