@@ -74,92 +74,101 @@ contract CertificateTest is DSTest {
     }
 
     function test_mint() public {
-        // @dev revert on not owner
-        hevm.prank(user1);
-        hevm.expectRevert("Certificate: caller is not a minter");
-        certificate.mint(address(coffeeBatch), 1);
-
-        certificate.addMinter(user1);
-        hevm.startPrank(user1);
-        hevm.expectRevert("INVALID_RECIPIENT");
-        certificate.mint(address(0), 1);
-
-        hevm.expectEmit(true, true, true, true);
-        emit Transfer(address(0), address(coffeeBatch), 1);
-        certificate.mint(address(coffeeBatch), 1);
-
-        assertEq(certificate.balanceOf(address(coffeeBatch)), 1);
-        assertEq(certificate.ownerOf(1), address(coffeeBatch));
-        certificate.mint(address(coffeeBatch));
-        certificate.mint(address(coffeeBatch));
-        assertEq(certificate.balanceOf(address(coffeeBatch)), 3);
-        assertEq(certificate.ownerOf(2), address(coffeeBatch));
-        assertEq(certificate.ownerOf(3), address(coffeeBatch));
-    }
-
-    //TODO: only owner of CB can burn
-    function test_burn() public {
-        certificate.addMinter(user1);
-        hevm.prank(user1);
-        certificate.mint(user1);
-
-        hevm.expectRevert("Certificate: caller is not the owner");
-        hevm.prank(user2);
-        certificate.burn(1);
-
-        hevm.expectEmit(true, true, true, true);
-        hevm.prank(user1);
-        emit Transfer(user1, address(0), 1);
-        certificate.burn(1);
-
-        assertEq(certificate.balanceOf(user1), 0);
-        assertEq(certificate.ownerOf(1), address(0));
-    }
-
-    // TODO: Disable transfers
-    function test_transfer() public {
-        certificate.addMinter(user1);
-        hevm.prank(user1);
-        certificate.mint(user1);
-
-        //Wrong owner
-        hevm.expectRevert("NOT_AUTHORIZED");
-        hevm.startPrank(user2);
-        certificate.transferFrom(user1, user2, 1);
-
-        //Wrong owner
-        hevm.expectRevert("WRONG_FROM");
-        certificate.transferFrom(user2, user2, 1);
-
-        hevm.expectEmit(true, true, true, true);
-        hevm.prank(user1);
-        emit Transfer(user1, user2, 1);
-        certificate.transferFrom(user1, user2, 1);
-    }
-
-    //TODO: disable approvals
-    function test_approval() public {
-        certificate.addMinter(user1);
-        hevm.prank(user1);
-        certificate.mint(user1);
-
-        //Wrong owner
-        hevm.expectRevert("NOT_AUTHORIZED");
-        hevm.prank(user2);
-        certificate.approve(user2, 1);
-
-        hevm.expectEmit(true, true, true, true);
-        hevm.prank(user1);
-        emit Approval(user1, user2, 1);
-        certificate.approve(user2, 1);
-
-        hevm.expectEmit(true, true, true, true);
-        hevm.prank(user2);
-        emit Transfer(user1, user2, 1);
-        certificate.transferFrom(user1, user2, 1);
-    }
-
-    function test_rootOwner() public {
         assert(false);
     }
+
+    function test_burn() public {
+        assert(false);
+    }
+
+    //
+    //    function test_mint() public {
+    //        // @dev revert on not owner
+    //        hevm.prank(user1);
+    //        hevm.expectRevert("Certificate: caller is not a minter");
+    //        certificate.mint(address(coffeeBatch), 1);
+    //
+    //        certificate.addMinter(user1);
+    //        hevm.startPrank(user1);
+    //        hevm.expectRevert("INVALID_RECIPIENT");
+    //        certificate.mint(address(0), 1);
+    //
+    //        hevm.expectEmit(true, true, true, true);
+    //        emit Transfer(address(0), address(coffeeBatch), 1);
+    //        certificate.mint(address(coffeeBatch), 1);
+    //
+    //        assertEq(certificate.balanceOf(address(coffeeBatch)), 1);
+    //        assertEq(certificate.ownerOf(1), address(coffeeBatch));
+    //        certificate.mint(address(coffeeBatch));
+    //        certificate.mint(address(coffeeBatch));
+    //        assertEq(certificate.balanceOf(address(coffeeBatch)), 3);
+    //        assertEq(certificate.ownerOf(2), address(coffeeBatch));
+    //        assertEq(certificate.ownerOf(3), address(coffeeBatch));
+    //    }
+    //
+    //    //TODO: only owner of CB can burn
+    //    function test_burn() public {
+    //        certificate.addMinter(user1);
+    //        hevm.prank(user1);
+    //        certificate.mint(user1);
+    //
+    //        hevm.expectRevert("Certificate: caller is not the owner");
+    //        hevm.prank(user2);
+    //        certificate.burn(1);
+    //
+    //        hevm.expectEmit(true, true, true, true);
+    //        hevm.prank(user1);
+    //        emit Transfer(user1, address(0), 1);
+    //        certificate.burn(1);
+    //
+    //        assertEq(certificate.balanceOf(user1), 0);
+    //        assertEq(certificate.ownerOf(1), address(0));
+    //    }
+    //
+    //    // TODO: Disable transfers
+    //    function test_transfer() public {
+    //        certificate.addMinter(user1);
+    //        hevm.prank(user1);
+    //        certificate.mint(user1);
+    //
+    //        //Wrong owner
+    //        hevm.expectRevert("NOT_AUTHORIZED");
+    //        hevm.startPrank(user2);
+    //        certificate.transferFrom(user1, user2, 1);
+    //
+    //        //Wrong owner
+    //        hevm.expectRevert("WRONG_FROM");
+    //        certificate.transferFrom(user2, user2, 1);
+    //
+    //        hevm.expectEmit(true, true, true, true);
+    //        hevm.prank(user1);
+    //        emit Transfer(user1, user2, 1);
+    //        certificate.transferFrom(user1, user2, 1);
+    //    }
+    //
+    //    //TODO: disable approvals
+    //    function test_approval() public {
+    //        certificate.addMinter(user1);
+    //        hevm.prank(user1);
+    //        certificate.mint(user1);
+    //
+    //        //Wrong owner
+    //        hevm.expectRevert("NOT_AUTHORIZED");
+    //        hevm.prank(user2);
+    //        certificate.approve(user2, 1);
+    //
+    //        hevm.expectEmit(true, true, true, true);
+    //        hevm.prank(user1);
+    //        emit Approval(user1, user2, 1);
+    //        certificate.approve(user2, 1);
+    //
+    //        hevm.expectEmit(true, true, true, true);
+    //        hevm.prank(user2);
+    //        emit Transfer(user1, user2, 1);
+    //        certificate.transferFrom(user1, user2, 1);
+    //    }
+    //
+    //    function test_rootOwner() public {
+    //        assert(false);
+    //    }
 }

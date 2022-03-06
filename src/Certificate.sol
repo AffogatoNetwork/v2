@@ -10,9 +10,19 @@ import "solmate/tokens/ERC721.sol";
 // 2. transfer to CB
 // 3. update CB state
 
+//TODO: this should be simpleERC998
+interface ICoffeeBatch {
+    function onERC721Received(
+        address _from,
+        uint256 _tokenId,
+        uint256 _childTokenId
+    ) external returns (bool);
+}
+
 contract Certificate is Ownable, ERC721 {
     mapping(address => bool) public minters;
     uint256 currentID = 0;
+    bytes4 magicNumber = 0x150b7a02;
 
     event SetMinter(address indexed owner, address indexed minter, bool status);
 
@@ -35,9 +45,18 @@ contract Certificate is Ownable, ERC721 {
         emit SetMinter(msg.sender, _minter, false);
     }
 
-    function mint(address _receiver) external onlyMinter {
+    function mint(address _coffeeBatch, uint256 _coffeeBatchId)
+        external
+        onlyMinter
+    {
         currentID++;
-        _mint(_receiver, currentID);
+        _mint(_coffeeBatch, currentID);
+        bool result = ICoffeeBatch(_coffeeBatch).onERC721Received(
+            msg.sender,
+            _coffeeBatchId,
+            currentID
+        );
+        require(result, "Not supported");
     }
 
     function burn(uint256 _id) external {

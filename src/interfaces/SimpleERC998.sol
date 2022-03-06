@@ -49,7 +49,7 @@ interface ERC998ERC721TopDown {
         address _to,
         address _childContract,
         uint256 _childTokenId,
-        bytes _data
+        bytes memory _data
     ) external;
 
     function transferChildToParent(
@@ -58,7 +58,7 @@ interface ERC998ERC721TopDown {
         uint256 _toTokenId,
         address _childContract,
         uint256 _childTokenId,
-        bytes _data
+        bytes memory _data
     ) external;
 
     // getChild function enables older contracts like cryptokitties to be transferred into a composable

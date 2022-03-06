@@ -1,0 +1,26 @@
+{
+  "Description": "Winner of the Cup of Excellence in 2017 and with a Parainema variety broke the international record by getting a price of US $ 124.50 per pound in the international auction, he got the attention not only of the media, of international buyers but of the President of the Republic.",
+  "name": "Parainema Washed",
+  "attributes":[
+    {"trait_type": "Process", "value":"washed"},
+    {"trait_type": "Country", "value":"Honduras"},
+    {"trait_type": "Region", "value":"El Paraíso"},
+    {"trait_type": "Village", "value":"Danlí"},
+    {"trait_type": "Altitude","value":1400},
+    {"trait_type": "Variety","value":"Parainema"},
+    {"trait_type": "Process", "value":"Washed"},
+    {"trait_type": "Size", "value":140},
+    {"trait_type": "Profile", "value":[
+      {
+        "score": "90",
+        "notes": "Green Apple and Peach, Citric",
+        "aroma": "Floral aroma of jasmine and roses.",
+        "body": "Velvety body",
+        "acidity": "Citric and refined acidity",
+        "additionalInformation": "Floral aroma of jasmine and roses. Citric and refined acidity. Velvety body"
+      }
+    ]
+    }
+  ],
+  "image": "QmaW5tjRFXXUvw82VT78Gt66oZSFLa5gqJvG46Lh15jC2n"
+}

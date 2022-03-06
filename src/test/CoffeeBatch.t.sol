@@ -3,11 +3,13 @@ pragma solidity 0.8.10;
 
 import "ds-test/test.sol";
 import "../CoffeeBatch.sol";
+import "../Certificate.sol";
 import "./Hevm.sol";
 
 contract CoffeeBatchTest is DSTest {
     address user1 = address(0x1);
     address user2 = address(0x2);
+    string tokenUri = "QmdWtVgS3xfYC4nYVmxK1TSXTX33SMi2JibHjBeSRyrCMK";
 
     Hevm hevm;
     CoffeeBatch coffeeBatch;
@@ -31,6 +33,13 @@ contract CoffeeBatchTest is DSTest {
         address indexed owner,
         address indexed operator,
         bool approved
+    );
+
+    event ReceivedChild(
+        address indexed _from,
+        uint256 indexed _tokenId,
+        address indexed _childContract,
+        uint256 _childTokenId
     );
 
     function setUp() public {
@@ -74,33 +83,36 @@ contract CoffeeBatchTest is DSTest {
         // @dev revert on not owner
         hevm.prank(user1);
         hevm.expectRevert("CoffeeBatch: caller is not a minter");
-        coffeeBatch.mint(_receiver);
+        coffeeBatch.mint(_receiver, tokenUri);
 
         coffeeBatch.addMinter(user1);
         hevm.startPrank(user1);
         if (_receiver == address(0)) {
             hevm.expectRevert("INVALID_RECIPIENT");
-            coffeeBatch.mint(_receiver);
+            coffeeBatch.mint(_receiver, tokenUri);
             return;
         }
 
         hevm.expectEmit(true, true, true, true);
         emit Transfer(address(0), _receiver, 1);
-        coffeeBatch.mint(_receiver);
+        coffeeBatch.mint(_receiver, tokenUri);
 
         assertEq(coffeeBatch.balanceOf(_receiver), 1);
         assertEq(coffeeBatch.ownerOf(1), _receiver);
-        coffeeBatch.mint(_receiver);
-        coffeeBatch.mint(_receiver);
+        coffeeBatch.mint(_receiver, "2");
+        coffeeBatch.mint(_receiver, "3");
         assertEq(coffeeBatch.balanceOf(_receiver), 3);
         assertEq(coffeeBatch.ownerOf(2), _receiver);
         assertEq(coffeeBatch.ownerOf(3), _receiver);
+        assertEq(coffeeBatch.tokenURI((1)), tokenUri);
+        assertEq(coffeeBatch.tokenURI((2)), "2");
+        assertEq(coffeeBatch.tokenURI((3)), "3");
     }
 
     function test_burn() public {
         coffeeBatch.addMinter(user1);
         hevm.prank(user1);
-        coffeeBatch.mint(user1);
+        coffeeBatch.mint(user1, tokenUri);
 
         hevm.expectRevert("CoffeeBatch: caller is not the owner");
         hevm.prank(user2);
@@ -118,7 +130,7 @@ contract CoffeeBatchTest is DSTest {
     function test_transfer() public {
         coffeeBatch.addMinter(user1);
         hevm.prank(user1);
-        coffeeBatch.mint(user1);
+        coffeeBatch.mint(user1, tokenUri);
 
         //Wrong owner
         hevm.expectRevert("NOT_AUTHORIZED");
@@ -138,7 +150,7 @@ contract CoffeeBatchTest is DSTest {
     function test_approval() public {
         coffeeBatch.addMinter(user1);
         hevm.prank(user1);
-        coffeeBatch.mint(user1);
+        coffeeBatch.mint(user1, tokenUri);
 
         //Wrong owner
         hevm.expectRevert("NOT_AUTHORIZED");
@@ -156,7 +168,30 @@ contract CoffeeBatchTest is DSTest {
         coffeeBatch.transferFrom(user1, user2, 1);
     }
 
-    function test_rootOwner() public {
-        assert(false);
+    function test_onReceivedChild() public {
+        // Mint
+        coffeeBatch.addMinter(user1);
+        hevm.prank(user1);
+        coffeeBatch.mint(user1, tokenUri);
+
+        Certificate certificate = new Certificate(
+            "Affogato Certificate",
+            "CERT"
+        );
+        certificate.addMinter(address(this));
+        hevm.expectEmit(true, true, true, true);
+        emit ReceivedChild(address(this), 1, address(certificate), 1);
+        certificate.mint(address(coffeeBatch), 1);
+
+        uint256 coffeeBatchId = coffeeBatch.rootOwnerOfChild(
+            address(certificate),
+            1
+        );
+        assertEq(1, coffeeBatchId);
+
+        (address ownerOfChild, uint256 parentTokenId) = coffeeBatch
+            .ownerOfChild(address(certificate), 1);
+        assertEq(user1, ownerOfChild);
+        assertEq(1, parentTokenId);
     }
 }
